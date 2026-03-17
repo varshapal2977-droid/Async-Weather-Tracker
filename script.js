@@ -1,108 +1,81 @@
-const API_KEY="0133cc5316757ac730cc46ae342334e4"
-const form=document.querySelector('#form')
-const weatherDetail=document.querySelector('.info')
-const searchHistory=document.querySelector('.historyBtn')
+const API_KEY = "0133cc5316757ac730cc46ae342334e4";
 
-// Load history from localStorage; support old string-based entries and migrate to unique object entries.
-let cityHistory = (function () {
-    const stored = JSON.parse(localStorage.getItem("cityHistory")) || [];
-    if (stored.length && typeof stored[0] === "string") {
-        // migrate old format to object with a key (lowercase) for uniqueness
-        return stored.map(city => ({
-            key: city.toLowerCase(),
-            city,
-            timestamp: null,
-        }));
-    }
-    return stored;
-})();
+// Correct selectors
+const cityInput = document.getElementById("cityInput");
+const cityEl = document.getElementById("city");
+const tempEl = document.getElementById("temp");
+const weatherEl = document.getElementById("weather");
+const humidityEl = document.getElementById("humidity");
+const windEl = document.getElementById("wind");
+const historyDiv = document.getElementById("history");
 
-form.addEventListener('submit', async function(event) {
-    event.preventDefault();
-    const searchCity = city.value;
-    console.log(searchCity);
-    getData(searchCity);
-});
-
-async function getData(searchCity) {
-    if (searchCity){
-        try{
-            const res =await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${searchCity}&appid=${API_KEY}`)
-            const data=await res.json()
-            if(data.cod===200){
-                weatherDetail.innerHTML=`
-                <p>City: ${data.name}</p>
-                <p>Temp: ${(data.main.temp-273).toFixed(1)}C</p>
-                <p>Weather: ${data.weather[0].main}</p>
-                <p>Humidity: ${data.main.humidity}</p>
-                <p>Wind: ${data.wind.speed}m/s</p>
-                `
-                addCityToHistory(searchCity);
-                displayHistory();
-            }else{
-                weatherDetail.innerHTML=`<p>City not found</p>`
-            }
-        }catch(e){
-            console.log(e)
-        }
-    }
-}
-
-function saveHistory() {
-    localStorage.setItem("cityHistory", JSON.stringify(cityHistory));
-}
-
-function addCityToHistory(city) {
-    const normalized = city.trim();
-    const key = normalized.toLowerCase();
-    const now = new Date().toISOString();
-
-    const existing = cityHistory.find(entry => entry.key === key);
-    if (existing) {
-        existing.city = normalized;
-        existing.timestamp = now;
-    } else {
-        cityHistory.push({ key, city: normalized, timestamp: now });
-    }
-
-    saveHistory();
-}
-
-function loadHistory() {
-    cityHistory = (function () {
-        const stored = JSON.parse(localStorage.getItem("cityHistory")) || [];
-        if (stored.length && typeof stored[0] === "string") {
-            return stored.map(city => ({
-                key: city.toLowerCase(),
-                city,
-                timestamp: null,
-            }));
-        }
-        return stored;
-    })();
-}
-
-function displayHistory() {
-    loadHistory();
-    searchHistory.innerHTML = "";
-    if (!cityHistory || !cityHistory.length) return;
-
-    cityHistory
-        .slice()
-        .sort((a, b) => {
-            if (!a.timestamp) return 1;
-            if (!b.timestamp) return -1;
-            return b.timestamp.localeCompare(a.timestamp);
-        })
-        .forEach(entry => {
-            const btn = document.createElement("button");
-            const timeLabel = entry.timestamp ? ` (${new Date(entry.timestamp).toLocaleString()})` : "";
-            btn.innerText = `${entry.city}${timeLabel}`;
-            btn.addEventListener("click", function() {
-                getData(entry.city);
-            });
-            searchHistory.appendChild(btn);
-        });
-}
-
+// Load history
+let cityHistory = JSON.parse(localStorage.getItem("cityHistory")) || [];
 displayHistory();
+
+// ✅ MAIN FUNCTION (called from button)
+async function getWeather(cityName) {
+
+    console.log("1️⃣ Sync Start");
+
+    const city = cityName || cityInput.value.trim();
+
+    if (!city) {
+        alert("Please enter city name");
+        return;
+    }
+
+    console.log("2️⃣ [ASYNC] Start fetching");
+
+    try {
+        const res = await fetch(
+            `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${API_KEY}&units=metric`
+        );
+
+        console.log("3️⃣ Response received");
+
+        if (!res.ok) {
+            throw new Error("City not found");
+        }
+
+        const data = await res.json();
+
+        console.log("4️⃣ Data processed");
+
+        // ✅ Update UI (matches your HTML)
+        cityEl.innerText = `${data.name}, ${data.sys.country}`;
+        tempEl.innerText = `${data.main.temp} °C`;
+        weatherEl.innerText = data.weather[0].main;
+        humidityEl.innerText = `${data.main.humidity}%`;
+        windEl.innerText = `${data.wind.speed} m/s`;
+
+        // ✅ Save history
+        if (!cityHistory.includes(city)) {
+            cityHistory.push(city);
+            localStorage.setItem("cityHistory", JSON.stringify(cityHistory));
+            displayHistory();
+        }
+
+    } catch (error) {
+        console.log("❌ Error:", error);
+        alert(error.message);
+    }
+
+    console.log("5️⃣ Sync End");
+}
+
+// ✅ DISPLAY HISTORY
+function displayHistory() {
+    historyDiv.innerHTML = "";
+
+    cityHistory.forEach((city) => {
+        const span = document.createElement("span");
+        span.innerText = city;
+
+        span.addEventListener("click", () => {
+            getWeather(city);
+        });
+
+        historyDiv.appendChild(span);
+    });
+}
