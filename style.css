@@ -1,81 +1,129 @@
-body{
-margin:0;
-font-family:Arial;
-background:#1e2b6f;
-color:white;
-text-align:center;
+/* Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, Helvetica, sans-serif;
 }
 
-.title{
-margin-top:20px;
+/* Body */
+body {
+    background: #1f2a5a;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 30px;
 }
 
-.main{
-display:flex;
-justify-content:center;
-gap:30px;
-margin-top:30px;
+/* Title */
+h1 {
+    color: #cfd8ff;
+    margin-bottom: 20px;
 }
 
-.card{
-background:white;
-color:black;
-width:350px;
-padding:20px;
-border-radius:10px;
-text-align:left;
+/* Top Section */
+.topSection {
+    display: flex;
+    gap: 20px;
+    width: 800px;
 }
 
-.search{
-display:flex;
-gap:10px;
-margin-bottom:20px;
+/* Cards */
+.weatherForm,
+.info,
+.console {
+    background: #2b356d;
+    border-radius: 10px;
+    padding: 15px;
 }
 
-input{
-flex:1;
-padding:8px;
-border:1px solid #ccc;
-border-radius:5px;
+/* Equal width cards */
+.weatherForm,
+.info {
+    flex: 1;
 }
 
-button{
-background:#ff7a30;
-border:none;
-color:white;
-padding:8px 15px;
-border-radius:5px;
-cursor:pointer;
+/* Headings */
+h3 {
+    color: white;
+    margin-bottom: 10px;
+    font-size: 14px;
 }
 
-#history span{
-background:#ff7a30;
-color:white;
-padding:5px 12px;
-border-radius:20px;
-margin-right:5px;
-font-size:14px;
+/* Form */
+#form {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
 }
 
-.info div{
-display:flex;
-justify-content:space-between;
-border-left:3px solid #ff7a30;
-padding:8px;
-margin:8px 0;
-background:#f4f4f4;
+/* Input */
+#city {
+    flex: 1;
+    padding: 8px;
+    border-radius: 6px;
+    border: none;
+    outline: none;
 }
 
-.console{
-background:#0f1c54;
-width:760px;
-margin:30px auto;
-padding:20px;
-border-radius:10px;
-text-align:left;
+/* Button */
+#search {
+    background: #ff7a2f;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 6px;
+    cursor: pointer;
 }
 
-pre{
-color:#9bd3ff;
-font-size:14px;
+#search:hover {
+    background: #ff5f00;
+}
+
+/* History buttons */
+.historyBtn {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.historyBtn button {
+    background: #ff7a2f;
+    border: none;
+    color: white;
+    padding: 4px 10px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+/* Weather info */
+.info p {
+    color: #e0e6ff;
+    margin: 6px 0;
+    border-left: 3px solid #ff7a2f;
+    padding-left: 8px;
+}
+
+/* Console section */
+.console {
+    margin-top: 20px;
+    width: 800px;
+}
+
+/* Console box inside */
+.consoleBox {
+    background: #1a214a;
+    border-radius: 6px;
+    padding: 10px;
+    height: 120px;
+    overflow-y: auto;
+    color: #cfd8ff;
+    font-size: 13px;
+}
+
+/* each log line */
+.log {
+    margin: 3px 0;
 }

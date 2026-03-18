@@ -1,81 +1,85 @@
-const API_KEY = "0133cc5316757ac730cc46ae342334e4";
+const API_KEY="0133cc5316757ac730cc46ae342334e4"
+const form=document.querySelector('#form')
+const weatherDetail=document.querySelector('.info')
+const searchHistory=document.querySelector('.historyBtn')
+const consoleBox = document.getElementById("consoleBox")
 
-// Correct selectors
-const cityInput = document.getElementById("cityInput");
-const cityEl = document.getElementById("city");
-const tempEl = document.getElementById("temp");
-const weatherEl = document.getElementById("weather");
-const humidityEl = document.getElementById("humidity");
-const windEl = document.getElementById("wind");
-const historyDiv = document.getElementById("history");
+let cityHistory =JSON.parse(localStorage.getItem("cityHistory")) || []
 
-// Load history
-let cityHistory = JSON.parse(localStorage.getItem("cityHistory")) || [];
-displayHistory();
 
-// ✅ MAIN FUNCTION (called from button)
-async function getWeather(cityName) {
+form.addEventListener('submit',async function(event){
+    event.preventDefault()
+    const searchCity=city.value
+    runEventLoopDemo()
+    console.log(searchCity)
+    getData(searchCity)
 
-    console.log("1️⃣ Sync Start");
+})
 
-    const city = cityName || cityInput.value.trim();
-
-    if (!city) {
-        alert("Please enter city name");
-        return;
-    }
-
-    console.log("2️⃣ [ASYNC] Start fetching");
-
-    try {
-        const res = await fetch(
-            `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${API_KEY}&units=metric`
-        );
-
-        console.log("3️⃣ Response received");
-
-        if (!res.ok) {
-            throw new Error("City not found");
+async function getData(searchCity) {
+    if (searchCity){
+        try{
+            const res =await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${searchCity}&appid=${API_KEY}`)
+            const data=await res.json()
+            if(data.cod===200){
+                weatherDetail.innerHTML=`
+                <p>City: ${data.name}</p>
+                <p>Temp: ${(data.main.temp-273).toFixed(1)}C</p>
+                <p>Weather: ${data.weather[0].main}</p>
+                <p>Humidity: ${data.main.humidity}</p>
+                <p>Wind: ${data.wind.speed}m/s</p>
+                `
+                if(!cityHistory.includes(searchCity)){
+                    cityHistory.push(searchCity)
+                    localStorage.setItem("cityHistory",JSON.stringify(cityHistory))
+                    displayHistory()
+                }
+            }else{
+                weatherDetail.innerHTML=`<p>City not found</p>`
+            }
+        }catch(e){
+            console.log(e)
         }
-
-        const data = await res.json();
-
-        console.log("4️⃣ Data processed");
-
-        // ✅ Update UI (matches your HTML)
-        cityEl.innerText = `${data.name}, ${data.sys.country}`;
-        tempEl.innerText = `${data.main.temp} °C`;
-        weatherEl.innerText = data.weather[0].main;
-        humidityEl.innerText = `${data.main.humidity}%`;
-        windEl.innerText = `${data.wind.speed} m/s`;
-
-        // ✅ Save history
-        if (!cityHistory.includes(city)) {
-            cityHistory.push(city);
-            localStorage.setItem("cityHistory", JSON.stringify(cityHistory));
-            displayHistory();
-        }
-
-    } catch (error) {
-        console.log("❌ Error:", error);
-        alert(error.message);
     }
-
-    console.log("5️⃣ Sync End");
 }
 
-// ✅ DISPLAY HISTORY
-function displayHistory() {
-    historyDiv.innerHTML = "";
+function displayHistory(){
+   searchHistory.innerHTML=""
+   const history=JSON.parse(localStorage.getItem("cityHistory"))
+   console.log(history)
+   if(history){
+      history.forEach((city) => {
+         const btn=document.createElement("button")
+         btn.innerText=city
+         btn.addEventListener("click",function(){
+            getData(city)
+         })
+         searchHistory.appendChild(btn)
+      });
+   }
+}
 
-    cityHistory.forEach((city) => {
-        const span = document.createElement("span");
-        span.innerText = city;
+displayHistory()
 
-        span.addEventListener("click", () => {
-            getWeather(city);
-        });
+function logMessage(msg) {
+    const p = document.createElement("p");
+    p.classList.add("log");
+    p.innerText = msg;
+    consoleBox.appendChild(p);
+}
 
-        historyDiv.appendChild(span);
+function runEventLoopDemo() {
+    consoleBox.innerHTML = ""; // clear previous
+
+    logMessage("Sync Start");
+
+    setTimeout(() => {
+        logMessage("setTimeout (Macrotask)");
+    }, 0);
+
+    Promise.resolve().then(() => {
+        logMessage("Promise.then (Microtask)");
     });
+
+    logMessage("Sync End");
 }
