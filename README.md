@@ -1,5 +1,5 @@
 # 🌤️ Async Weather Tracker
-<img width="936" height="442" alt="Screenshot 2026-03-17 210609" src="https://github.com/user-attachments/assets/42e85dfb-0f35-4ad9-ba06-ad905b786df9" />
+<img width="936" height="437" alt="image" src="https://github.com/user-attachments/assets/f7919e3a-21aa-4b53-bdd2-46d0d771d57a" />
 
 
 ## 📌 Overview
